@@ -97,11 +97,11 @@ def run_one_epoch(
         total_loss += loss.item()
         avg_loss = total_loss / step
         progress_bar.set_postfix(loss=f"{loss.item():.4f}", avg_loss=f"{avg_loss:.4f}")
-        if step == 1 or step % log_steps == 0 or step == len(data_loader):
-            print(
-                f"Epoch {epoch} | train step {step}/{len(data_loader)} "
-                f"| loss: {loss.item():.4f}"
-            )
+        # if step == 1 or step % log_steps == 0 or step == len(data_loader):
+        #     print(
+        #         f"Epoch {epoch} | train step {step}/{len(data_loader)} "
+        #         f"| loss: {loss.item():.4f}"
+        #     )
 
     return total_loss / max(1, len(data_loader))
 
@@ -142,11 +142,11 @@ def evaluate(
         all_labels.append(labels.cpu().numpy())
         all_probs.append(probs.cpu().numpy())
 
-        if step == 1 or step == len(data_loader):
-            print(
-                f"Epoch {epoch} | test step {step}/{len(data_loader)} "
-                f"| loss: {loss.item():.4f}"
-            )
+        # if step == 1 or step == len(data_loader):
+        #     print(
+        #         f"Epoch {epoch} | test step {step}/{len(data_loader)} "
+        #         f"| loss: {loss.item():.4f}"
+        #     )
 
     y_true = np.vstack(all_labels)
     y_score = np.vstack(all_probs)
