@@ -123,6 +123,24 @@ def split_by_primary_topic(
 
     train_df = pd.concat(train_parts).sample(frac=1.0, random_state=seed).reset_index(drop=True)
     test_df = pd.concat(test_parts).sample(frac=1.0, random_state=seed).reset_index(drop=True)
+
+    # Keep exact duplicate papers out of both splits at the same time. This avoids
+    # leakage when the same title + abstract appears multiple times in the source CSV.
+    key_cols = ["title", "abstract"]
+    train_keys = set(map(tuple, train_df[key_cols].astype(str).to_numpy()))
+    test_keys = set(map(tuple, test_df[key_cols].astype(str).to_numpy()))
+    overlapping_keys = train_keys.intersection(test_keys)
+    if overlapping_keys:
+        test_key_series = list(map(tuple, test_df[key_cols].astype(str).to_numpy()))
+        overlap_mask = pd.Series(
+            [key in overlapping_keys for key in test_key_series],
+            index=test_df.index,
+        )
+        train_df = pd.concat([train_df, test_df[overlap_mask]], ignore_index=True)
+        test_df = test_df[~overlap_mask].copy()
+        train_df = train_df.sample(frac=1.0, random_state=seed).reset_index(drop=True)
+        test_df = test_df.sample(frac=1.0, random_state=seed).reset_index(drop=True)
+
     return train_df, test_df
 
 
