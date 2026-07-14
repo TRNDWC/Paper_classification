@@ -1,0 +1,100 @@
+field_id,field_name,subfield_id,subfield_name,topic_id,topic
+10010405,Applied computing,10010469,Arts and humanities,10010473,Language translation
+10010405,Applied computing,10010462,Computer forensics,10010465,"Evidence collection, storage and analysis"
+10010405,Applied computing,10010476,Computers in other domains,10010480,Agriculture
+10010405,Applied computing,10010497,Document management and text processing,10010498,Document searching
+10010405,Applied computing,10010489,Education,10010494,Distance learning
+10010405,Applied computing,10010489,Education,10010495,E-learning
+10010405,Applied computing,10010489,Education,10010491,Interactive learning environments
+10010405,Applied computing,10010406,Enterprise computing,10010412,Business process management
+10010405,Applied computing,10010444,Life and medical sciences,10010450,Bioinformatics
+10010405,Applied computing,10010444,Life and medical sciences,10010087,Computational biology
+10010405,Applied computing,10010444,Life and medical sciences,10010093,Genomics
+10010405,Applied computing,10010444,Life and medical sciences,10010449,Health informatics
+10010405,Applied computing,10010481,Operations research,10010487,Forecasting
+10010405,Applied computing,10010432,Physical sciences and engineering,10010439,Engineering
+10010405,Applied computing,10010432,Physical sciences and engineering,10010988,Telecommunications
+10010520,Computer systems organization,10010521,Architectures,10010537,Distributed architectures
+10010520,Computer systems organization,10010575,Dependable and fault-tolerant systems and networks,10010577,Reliability
+10010520,Computer systems organization,10010553,Embedded and cyber-physical systems,10010562,Embedded systems
+10010520,Computer systems organization,10010553,Embedded and cyber-physical systems,10010554,Robotics
+10010147,Computing methodologies,10010178,Artificial intelligence,10010224,Computer vision
+10010147,Computing methodologies,10010178,Artificial intelligence,10010219,Distributed artificial intelligence
+10010147,Computing methodologies,10010178,Artificial intelligence,10010187,Knowledge representation and reasoning
+10010147,Computing methodologies,10010178,Artificial intelligence,10010179,Natural language processing
+10010147,Computing methodologies,10010178,Artificial intelligence,10010199,Planning and scheduling
+10010147,Computing methodologies,10010178,Artificial intelligence,10010205,Search methodologies
+10010147,Computing methodologies,10010371,Computer graphics,10010395,Image compression
+10010147,Computing methodologies,10010371,Computer graphics,10010382,Image manipulation
+10010147,Computing methodologies,10010257,Machine learning,10010339,Cross-validation
+10010147,Computing methodologies,10010257,Machine learning,10010258,Learning paradigms
+10010147,Computing methodologies,10010257,Machine learning,10010282,Learning settings
+10010147,Computing methodologies,10010257,Machine learning,10010321,Machine learning algorithms
+10010147,Computing methodologies,10010257,Machine learning,10010293,Machine learning approaches
+10010147,Computing methodologies,10010341,Modeling and simulation,10010349,Simulation types and techniques
+10002944,General and reference,10011123,Cross-computing tools and techniques,10011130,Evaluation
+10002944,General and reference,10011123,Cross-computing tools and techniques,10011131,Experimentation
+10002944,General and reference,10011122,Document types,10002945,Surveys and overviews
+10010583,Hardware,10010588,"Communication hardware, interfaces and storage",10003247,Signal processing systems
+10010583,Hardware,10010786,Emerging technologies,10010813,Quantum technologies
+10010583,Hardware,10010662,Power and energy,10010663,Energy generation and storage
+10003120,Human-centered computing,10003130,Collaborative and social computing,10003131,"Collaborative and social computing theory, concepts and paradigms"
+10003120,Human-centered computing,10003121,Human computer interaction (HCI),10003122,HCI design and evaluation methods
+10003120,Human-centered computing,10003121,Human computer interaction (HCI),10003128,Interaction techniques
+10003120,Human-centered computing,10003138,Ubiquitous and mobile computing,10003140,Ubiquitous and mobile computing systems and tools
+10003120,Human-centered computing,10003138,Ubiquitous and mobile computing,10003141,Ubiquitous and mobile devices
+10003120,Human-centered computing,10003145,Visualization,10003146,Visualization techniques
+10002951,Information systems,10002952,Data management systems,10002971,Data structures
+10002951,Information systems,10002952,Data management systems,10002953,Database design and models
+10002951,Information systems,10003317,Information retrieval,10003338,Retrieval models and ranking
+10002951,Information systems,10003317,Information retrieval,10003365,Search engine architectures and scalability
+10002951,Information systems,10003317,Information retrieval,10003371,Specialized information retrieval
+10002951,Information systems,10003152,Information storage systems,10003520,Storage management
+10002951,Information systems,10003227,Information systems applications,10010926,Computing platforms
+10002951,Information systems,10003227,Information systems applications,10003351,Data mining
+10002951,Information systems,10003227,Information systems applications,10003241,Decision support systems
+10002951,Information systems,10003227,Information systems applications,10003251,Multimedia information systems
+10002951,Information systems,10003260,World Wide Web,10003282,Web applications
+10002951,Information systems,10003260,World Wide Web,10003277,Web mining
+10002950,Mathematics of computing,10003624,Discrete mathematics,10003633,Graph theory
+10002950,Mathematics of computing,10003712,Information theory,10003713,Coding theory
+10002950,Mathematics of computing,10003714,Mathematical analysis,10003716,Mathematical optimization
+10002950,Mathematics of computing,10003714,Mathematical analysis,10003715,Numerical analysis
+10002950,Mathematics of computing,10003648,Probability and statistics,10003704,Multivariate statistics
+10002950,Mathematics of computing,10003648,Probability and statistics,10003662,Probabilistic inference problems
+10002950,Mathematics of computing,10003648,Probability and statistics,10003700,Stochastic processes
+10003033,Networks,10003034,Network architectures,10003035,Network design principles
+10003033,Networks,10003058,Network components,10003065,"Wireless access points, base stations and infrastructure"
+10003033,Networks,10003079,Network performance evaluation,10003080,Network performance modeling
+10003033,Networks,10003083,Network properties,10003014,Network security
+10003033,Networks,10003039,Network protocols,10003048,Transport protocols
+10003033,Networks,10003099,Network services,10003100,Cloud computing
+10003033,Networks,10003106,Network types,10010582,Ad hoc networks
+10003033,Networks,10003106,Network types,10003113,Mobile networks
+10003033,Networks,10003106,Network types,10003119,Wireless access networks
+10002978,Security and privacy,10002979,Cryptography,10002981,Public key (asymmetric) techniques
+10002978,Security and privacy,10002979,Cryptography,10002982,Symmetric cryptography and hash functions
+10002978,Security and privacy,10002986,Formal methods and theory of security,10002988,Security requirements
+10002978,Security and privacy,10003029,Human and societal aspects of security and privacy,10011150,Privacy protections
+10002978,Security and privacy,10002997,Intrusion/anomaly detection and malware mitigation,10002999,Intrusion detection systems
+10002978,Security and privacy,10002997,Intrusion/anomaly detection and malware mitigation,10002998,Malware and its mitigation
+10002978,Security and privacy,10002991,Security services,10002993,Access control
+10002978,Security and privacy,10002991,Security services,10002992,Authentication
+10002978,Security and privacy,10003022,Software and application security,10003023,Software security engineering
+10002978,Security and privacy,10003022,Software and application security,10003026,Web application security
+10002978,Security and privacy,10003006,Systems security,10011610,Denial-of-service attacks
+10002978,Security and privacy,10003006,Systems security,10003013,Distributed systems security
+10003456,Social and professional topics,10003462,Computing / technology policy,10003477,Privacy policies
+10003456,Social and professional topics,10003457,Professional topics,10003527,Computing education
+10011007,Software and its engineering,10011074,Software creation and management,10011075,Designing software
+10011007,Software and its engineering,10011074,Software creation and management,10011081,Software development process management
+10011007,Software and its engineering,10011074,Software creation and management,10011099,Software verification and validation
+10011007,Software and its engineering,10011006,Software notations and tools,10011066,Development frameworks and environments
+10011007,Software and its engineering,10011006,Software notations and tools,10011008,General programming languages
+10003752,Theory of computation,10003777,Computational complexity and cryptography,10003789,Cryptographic protocols
+10003752,Theory of computation,10003809,Design and analysis of algorithms,10011254,Algorithm design techniques
+10003752,Theory of computation,10003809,Design and analysis of algorithms,10010172,Distributed algorithms
+10003752,Theory of computation,10003790,Logic,10003794,Automated reasoning
+10003752,Theory of computation,10003753,Models of computation,10003758,Quantum computation theory
+10003752,Theory of computation,10010061,"Randomness, geometry and discrete structures",10010063,Computational geometry
+10003752,Theory of computation,10010070,Theory and algorithms for application domains,10010071,Machine learning theory
