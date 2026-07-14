@@ -1,5 +1,5 @@
 import random
-from typing import Dict, List, Optional, Sequence, Tuple
+from typing import Dict, Optional, Tuple
 
 import numpy as np
 import pandas as pd
@@ -157,19 +157,21 @@ class PapersDataset(Dataset):
 
 
 def create_dataloaders(
-    csv_path: str,
+    train_csv_path: str,
+    test_csv_path: str,
     tokenizer,
     taxonomy_path: Optional[str] = None,
     max_length: int = 256,
     batch_size: int = 16,
-    test_size: float = 0.2,
     seed: int = 42,
     num_workers: int = 0,
 ) -> Tuple[DataLoader, DataLoader, Dict[int, int], Dict[int, int]]:
-    papers_df = load_papers(csv_path)
-    label2id, id2label = build_label_mapping(papers_df, taxonomy_path)
-    papers_df = add_multihot_labels(papers_df, label2id)
-    train_df, test_df = split_by_primary_topic(papers_df, test_size=test_size, seed=seed)
+    train_df = load_papers(train_csv_path)
+    test_df = load_papers(test_csv_path)
+    all_df = pd.concat([train_df, test_df], ignore_index=True)
+    label2id, id2label = build_label_mapping(all_df, taxonomy_path)
+    train_df = add_multihot_labels(train_df, label2id)
+    test_df = add_multihot_labels(test_df, label2id)
 
     train_dataset = PapersDataset(train_df, tokenizer=tokenizer, max_length=max_length)
     test_dataset = PapersDataset(test_df, tokenizer=tokenizer, max_length=max_length)
