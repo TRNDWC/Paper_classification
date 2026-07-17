@@ -161,9 +161,10 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--taxonomy_path", default="taxonomy.csv")
     parser.add_argument("--model_name", default="allenai/scibert_scivocab_uncased")
     parser.add_argument("--output_dir", default="outputs")
+    parser.add_argument("--log_dir", default="logs")
     parser.add_argument("--log_file", default=None)
-    parser.add_argument("--max_length", type=int, default=512)
-    parser.add_argument("--batch_size", type=int, default=16)
+    parser.add_argument("--max_length", type=int, default=128)
+    parser.add_argument("--batch_size", type=int, default=64)
     parser.add_argument("--epochs", type=int, default=5)
     parser.add_argument("--lr", type=float, default=2e-5)
     parser.add_argument("--weight_decay", type=float, default=0.01)
@@ -234,11 +235,11 @@ def main() -> None:
         num_training_steps=total_steps,
     )
 
-    os.makedirs(args.output_dir, exist_ok=True)
+    os.makedirs(args.log_dir, exist_ok=True)
     if args.log_file is None:
         started_at = datetime.now().strftime("%Y%m%d_%H%M%S")
         args.log_file = f"{started_at}.txt"
-    log_path = os.path.join(args.output_dir, args.log_file)
+    log_path = os.path.join(args.log_dir, args.log_file)
     with open(log_path, "w", encoding="utf-8") as log_file:
         log_file.write("epoch\ttrain_loss\ttest_loss\tmAP\tF1-score\n")
     print(f"Metrics will be saved to {log_path}")

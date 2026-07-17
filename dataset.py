@@ -162,7 +162,7 @@ class PapersDataset(Dataset):
         row = self.df.iloc[index]
         encoding = self.tokenizer(
             row["title"],
-            row["abstract"],
+            # row["abstract"],
             add_special_tokens=True,
             max_length=self.max_length,
             padding="max_length",
