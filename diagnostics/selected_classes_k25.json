@@ -1,0 +1,127 @@
+[
+  {
+    "topic_id": 10010293,
+    "topic": "Machine learning approaches",
+    "n_primary": 104
+  },
+  {
+    "topic_id": 10010258,
+    "topic": "Learning paradigms",
+    "n_primary": 100
+  },
+  {
+    "topic_id": 10010179,
+    "topic": "Natural language processing",
+    "n_primary": 104
+  },
+  {
+    "topic_id": 10010224,
+    "topic": "Computer vision",
+    "n_primary": 104
+  },
+  {
+    "topic_id": 10010282,
+    "topic": "Learning settings",
+    "n_primary": 101
+  },
+  {
+    "topic_id": 10010071,
+    "topic": "Machine learning theory",
+    "n_primary": 102
+  },
+  {
+    "topic_id": 10010321,
+    "topic": "Machine learning algorithms",
+    "n_primary": 100
+  },
+  {
+    "topic_id": 10010219,
+    "topic": "Distributed artificial intelligence",
+    "n_primary": 103
+  },
+  {
+    "topic_id": 10010187,
+    "topic": "Knowledge representation and reasoning",
+    "n_primary": 102
+  },
+  {
+    "topic_id": 10003351,
+    "topic": "Data mining",
+    "n_primary": 102
+  },
+  {
+    "topic_id": 10003338,
+    "topic": "Retrieval models and ranking",
+    "n_primary": 101
+  },
+  {
+    "topic_id": 10003371,
+    "topic": "Specialized information retrieval",
+    "n_primary": 101
+  },
+  {
+    "topic_id": 10010199,
+    "topic": "Planning and scheduling",
+    "n_primary": 101
+  },
+  {
+    "topic_id": 10010087,
+    "topic": "Computational biology",
+    "n_primary": 103
+  },
+  {
+    "topic_id": 10010450,
+    "topic": "Bioinformatics",
+    "n_primary": 103
+  },
+  {
+    "topic_id": 10010449,
+    "topic": "Health informatics",
+    "n_primary": 101
+  },
+  {
+    "topic_id": 10010339,
+    "topic": "Cross-validation",
+    "n_primary": 103
+  },
+  {
+    "topic_id": 10003282,
+    "topic": "Web applications",
+    "n_primary": 102
+  },
+  {
+    "topic_id": 10003241,
+    "topic": "Decision support systems",
+    "n_primary": 104
+  },
+  {
+    "topic_id": 10003251,
+    "topic": "Multimedia information systems",
+    "n_primary": 103
+  },
+  {
+    "topic_id": 10010093,
+    "topic": "Genomics",
+    "n_primary": 104
+  },
+  {
+    "topic_id": 10010382,
+    "topic": "Image manipulation",
+    "n_primary": 104
+  },
+  {
+    "topic_id": 10010205,
+    "topic": "Search methodologies",
+    "n_primary": 100
+  },
+  {
+    "topic_id": 10002945,
+    "topic": "Surveys and overviews",
+    "n_primary": 102
+  },
+  {
+    "topic_id": 10010473,
+    "topic": "Language translation",
+    "n_primary": 103
+  }
+]
