@@ -1,0 +1,27 @@
+[
+  {
+    "topic_id": 10010293,
+    "topic": "Machine learning approaches",
+    "n_primary": 104
+  },
+  {
+    "topic_id": 10010258,
+    "topic": "Learning paradigms",
+    "n_primary": 100
+  },
+  {
+    "topic_id": 10010179,
+    "topic": "Natural language processing",
+    "n_primary": 104
+  },
+  {
+    "topic_id": 10010224,
+    "topic": "Computer vision",
+    "n_primary": 104
+  },
+  {
+    "topic_id": 10010282,
+    "topic": "Learning settings",
+    "n_primary": 101
+  }
+]
