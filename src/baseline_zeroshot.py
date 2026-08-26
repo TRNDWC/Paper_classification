@@ -15,7 +15,10 @@ from argparse import Namespace
 from datasets import load_dataset
 from transformers import HfArgumentParser
 from transformers import TrainingArguments as HFTrainingArguments
-import wandb
+try:
+    import wandb
+except ImportError:  # optional: runs fine without experiment tracking installed
+    wandb = None
 import evaluate
 from setfit import SetFitModel, Trainer, TrainingArguments
 from myutils import (
@@ -37,12 +40,13 @@ def main():
     args = Namespace(**vars(custom_args), **vars(prior_training_args))
     seed_everything(args.seed)
 
-    wandb.init(
-        project="scientific-text-classification",
-        name=args.experiment_name if args.experiment_name else None,
-        tags=["zero-shot"],
-        config={k: v for k, v in args.__dict__.items() if v is not None},
-    )
+    if wandb is not None:
+        wandb.init(
+            project="scientific-text-classification",
+            name=args.experiment_name if args.experiment_name else None,
+            tags=["zero-shot"],
+            config={k: v for k, v in args.__dict__.items() if v is not None},
+        )
     training_args = TrainingArguments(
         output_dir=os.path.join(args.output_dir, args.experiment_name),
         max_steps=args.max_steps,
@@ -114,7 +118,8 @@ def main():
 
     res = trainer.evaluate(subsample_test, metric_key_prefix="test")  # 10K samples is enough?
     print(res)
-    wandb.log({f"test/{k}": v for k, v in res.items()})
+    if wandb is not None:
+        wandb.log({f"test/{k}": v for k, v in res.items()})
 
     # print some example outputs
     trainer.push_to_hub(f"jordyvl/{args.experiment_name}")

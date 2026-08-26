@@ -28,7 +28,10 @@ from tqdm import tqdm
 from peft import LoraConfig, PeftModel
 from trl import SFTTrainer
 from transformers import TrainingArguments
-import wandb
+try:
+    import wandb
+except ImportError:  # optional: runs fine without experiment tracking installed
+    wandb = None
 from myutils import CustomArguments, seed_everything
 from munkres import Munkres, make_cost_matrix
 
@@ -278,12 +281,13 @@ def main():
     args = Namespace(**vars(custom_args), **vars(prior_training_args))
     seed_everything(args.seed)
 
-    wandb.init(
-        project="scientific-text-classification",
-        name=args.experiment_name if args.experiment_name else None,
-        tags=["generative"],
-        config={k: v for k, v in args.__dict__.items() if v is not None},
-    )
+    if wandb is not None:
+        wandb.init(
+            project="scientific-text-classification",
+            name=args.experiment_name if args.experiment_name else None,
+            tags=["generative"],
+            config={k: v for k, v in args.__dict__.items() if v is not None},
+        )
 
     instruction_data = "../data/arxiv_dataset_instructions"
     if not os.path.exists(instruction_data):
@@ -385,7 +389,8 @@ def main():
     anls = ANLSL(all_gt, all_pred)
     print(f"Exact match accuracy: {accuracy}")
     print(f"ANLS: {anls}")
-    wandb.log({"test/accuracy": accuracy, "test/anls": anls})
+    if wandb is not None:
+        wandb.log({"test/accuracy": accuracy, "test/anls": anls})
 
 
 if __name__ == "__main__":

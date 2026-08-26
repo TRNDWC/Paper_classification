@@ -10,14 +10,11 @@ __version__ = "3.0"
 #!pip install datasets transformers evaluate sentencepiece accelerate
 
 import os
+import sys
 import numpy as np
 from argparse import Namespace
 from transformers import AutoTokenizer, HfArgumentParser, DataCollatorWithPadding
 from transformers import AutoModelForSequenceClassification, TrainingArguments
-try:
-    import wandb
-except ImportError:  # optional: runs fine without experiment tracking installed
-    wandb = None
 from myutils import (
     CustomArguments,
     seed_everything,
@@ -38,13 +35,12 @@ def main():
     args = Namespace(**vars(custom_args), **vars(prior_training_args))
     seed_everything(args.seed)
 
-    if wandb is not None:
-        wandb.init(
-            project="scientific-text-classification",
-            name=args.experiment_name if args.experiment_name else None,
-            tags=["multi-label"],
-            config={k: v for k, v in args.__dict__.items() if v is not None},
-        )
+    # TrainingArguments resolves a missing --report_to to every installed integration (e.g. wandb)
+    # during argument parsing itself, before this line -- so args.report_to is never None here even
+    # when the flag was never passed. That auto-detected wandb then blocks on a login/API-key prompt
+    # if the package happens to be present but unconfigured. Require it to be opt-in on the CLI.
+    if "--report_to" not in sys.argv:
+        args.report_to = "none"
 
     ## Load the dataset and initialize the classes
     # DATAROOT = os.path.join(os.path.dirname(__file__), "..", "data")
