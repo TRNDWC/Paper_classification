@@ -4,7 +4,7 @@ CUDA_VISIBLE_DEVICES=2 python3 baseline_zeroshot.py --experiment_name setfit_sci
 --sentence_transformer 'jordyvl/scibert_scivocab_uncased_sentence_transformer' \
 --output_dir '../results' \
 --seed 42 \
---evaluation_strategy steps \
+--eval_strategy steps \
 --per_device_train_batch_size 6 \
 --gradient_accumulation_steps 1 \
 --learning_rate 2e-5 \
@@ -23,7 +23,7 @@ CUDA_VISIBLE_DEVICES=0 python3 baseline_zeroshot.py --experiment_name setfit_sci
 --sentence_transformer 'jordyvl/scibert_scivocab_uncased_sentence_transformer' \
 --output_dir '../results' \
 --seed 42 \
---evaluation_strategy steps \
+--eval_strategy steps \
 --per_device_train_batch_size 6 \
 --gradient_accumulation_steps 1 \
 --learning_rate 2e-5 \
@@ -39,7 +39,7 @@ CUDA_VISIBLE_DEVICES=0 python3 baseline_zeroshot.py --experiment_name test_imple
 --sentence_transformer 'jordyvl/scibert_scivocab_uncased_sentence_transformer' \
 --output_dir '../results' \
 --seed 42 \
---evaluation_strategy steps \
+--eval_strategy steps \
 --per_device_train_batch_size 8  \
 --gradient_accumulation_steps 1 \
 --learning_rate 2e-5 \
@@ -56,7 +56,7 @@ CUDA_VISIBLE_DEVICES=0 python3 baseline_zeroshot.py --experiment_name setfit_mpn
 --sentence_transformer 'jordyvl/scibert_scivocab_uncased_sentence_transformer' \
 --output_dir '../results' \
 --seed 42 \
---evaluation_strategy steps \
+--eval_strategy steps \
 --per_device_train_batch_size 6 \
 --gradient_accumulation_steps 1 \
 --learning_rate 2e-5 \

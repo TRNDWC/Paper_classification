@@ -4,7 +4,7 @@ CUDA_VISIBLE_DEVICES=0 python3 baseline_multilabel.py --experiment_name SciBERT_
 --model_name_or_path 'allenai/scibert_scivocab_uncased' \
 --output_dir '../results' \
 --seed 42 \
---evaluation_strategy steps \
+--eval_strategy steps \
 --per_device_train_batch_size 64 \
 --gradient_accumulation_steps 1 \
 --learning_rate 2e-5 \
@@ -22,7 +22,7 @@ CUDA_VISIBLE_DEVICES=1 python3 baseline_multilabel.py --experiment_name SciBERT_
 --model_name_or_path 'allenai/scibert_scivocab_uncased' \
 --output_dir '../results' \
 --seed 42 \
---evaluation_strategy steps \
+--eval_strategy steps \
 --per_device_train_batch_size 64 \
 --gradient_accumulation_steps 1 \
 --learning_rate 2e-5 \
@@ -40,7 +40,7 @@ CUDA_VISIBLE_DEVICES=2 python3 baseline_multilabel.py --experiment_name SciBERT_
 --model_name_or_path 'allenai/scibert_scivocab_uncased' \
 --output_dir '../results' \
 --seed 42 \
---evaluation_strategy steps \
+--eval_strategy steps \
 --per_device_train_batch_size 64 \
 --gradient_accumulation_steps 1 \
 --learning_rate 2e-5 \
@@ -58,7 +58,7 @@ CUDA_VISIBLE_DEVICES=2 python3 baseline_multilabel.py --experiment_name SciBERT_
 # --model_name_or_path 'allenai/scibert_scivocab_uncased' \
 # --output_dir '../results' \
 # --seed 42 \
-# --evaluation_strategy steps \
+# --eval_strategy steps \
 # --per_device_train_batch_size 64 \
 # --gradient_accumulation_steps 1 \
 # --learning_rate 2e-5 \
@@ -76,7 +76,7 @@ CUDA_VISIBLE_DEVICES=2 python3 baseline_multilabel.py --experiment_name SciBERT_
 # --model_name_or_path 'allenai/scibert_scivocab_uncased' \
 # --output_dir '../results' \
 # --seed 42 \
-# --evaluation_strategy steps \
+# --eval_strategy steps \
 # --per_device_train_batch_size 64 \
 # --gradient_accumulation_steps 1 \
 # --learning_rate 2e-5 \
@@ -97,7 +97,7 @@ CUDA_VISIBLE_DEVICES=3 python3 baseline_multilabel.py --experiment_name SciBERT_
 --model_name_or_path 'allenai/scibert_scivocab_uncased' \
 --output_dir '../results' \
 --seed 42 \
---evaluation_strategy steps \
+--eval_strategy steps \
 --per_device_train_batch_size 64 \
 --gradient_accumulation_steps 1 \
 --learning_rate 1e-5 \

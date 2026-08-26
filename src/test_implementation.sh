@@ -3,7 +3,7 @@ python3 baseline_multilabel.py --experiment_name test_AsymmetricLoss_25K_bs64_P4
 --model_name_or_path 'allenai/scibert_scivocab_uncased' \
 --output_dir '../results' \
 --seed 42 \
---evaluation_strategy steps \
+--eval_strategy steps \
 --per_device_train_batch_size 8  \
 --gradient_accumulation_steps 1 \
 --learning_rate 2e-5 \
@@ -23,7 +23,7 @@ CUDA_VISIBLE_DEVICES=3 python3 baseline_multilabel.py --experiment_name test_two
 --model_name_or_path 'bert-base-uncased' \
 --output_dir '../results' \
 --seed 42 \
---evaluation_strategy steps \
+--eval_strategy steps \
 --per_device_train_batch_size 8  \
 --gradient_accumulation_steps 1 \
 --learning_rate 2e-5 \
@@ -41,7 +41,7 @@ CUDA_VISIBLE_DEVICES=2 python3 baseline_generative.py --experiment_name Llama2_t
 --LLM 'NousResearch/Llama-2-7b-hf' \
 --output_dir '../results' \
 --seed 42 \
---evaluation_strategy steps \
+--eval_strategy steps \
 --per_device_train_batch_size 8  \
 --gradient_accumulation_steps 1 \
 --learning_rate 2e-5 \
@@ -56,7 +56,7 @@ CUDA_VISIBLE_DEVICES=2 python3 baseline_zeroshot.py --experiment_name test_imple
 --sentence_transformer 'jordyvl/scibert_scivocab_uncased_sentence_transformer' \
 --output_dir '../results' \
 --seed 42 \
---evaluation_strategy steps \
+--eval_strategy steps \
 --per_device_train_batch_size 8  \
 --gradient_accumulation_steps 1 \
 --learning_rate 2e-5 \

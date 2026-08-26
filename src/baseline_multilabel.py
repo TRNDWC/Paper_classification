@@ -12,14 +12,16 @@ __version__ = "3.0"
 import os
 import numpy as np
 from argparse import Namespace
-from datasets import load_dataset, ClassLabel, Sequence
 from transformers import AutoTokenizer, HfArgumentParser, DataCollatorWithPadding
 from transformers import AutoModelForSequenceClassification, TrainingArguments
-import wandb
-import evaluate
+try:
+    import wandb
+except ImportError:  # optional: runs fine without experiment tracking installed
+    wandb = None
 from myutils import (
     CustomArguments,
     seed_everything,
+    load_any_dataset,
     preprocess_function,
     MultiLabelTrainingArguments,
     MultiLabelTrainer,
@@ -36,12 +38,13 @@ def main():
     args = Namespace(**vars(custom_args), **vars(prior_training_args))
     seed_everything(args.seed)
 
-    wandb.init(
-        project="scientific-text-classification",
-        name=args.experiment_name if args.experiment_name else None,
-        tags=["multi-label"],
-        config={k: v for k, v in args.__dict__.items() if v is not None},
-    )
+    if wandb is not None:
+        wandb.init(
+            project="scientific-text-classification",
+            name=args.experiment_name if args.experiment_name else None,
+            tags=["multi-label"],
+            config={k: v for k, v in args.__dict__.items() if v is not None},
+        )
 
     ## Load the dataset and initialize the classes
     # DATAROOT = os.path.join(os.path.dirname(__file__), "..", "data")
@@ -53,23 +56,41 @@ def main():
     # )
     # dataset["simple_validation"] = simple_validation["test"]
 
-    dataset = load_dataset("jordyvl/arxiv_dataset_prep")  # new version for continued comparisons
+    dataset = load_any_dataset(args.dataset_name)  # hub id, save_to_disk dir, or local csv/json
 
-    label_name = "cats"
+    label_name = args.label_column
 
     classes = sorted(set([c for cats in dataset["train"][label_name] for c in cats]))
-    dataset.cast_column(label_name, Sequence(ClassLabel(names=classes)))  # .class_encode_column("cats")
     class2id = {class_: id for id, class_ in enumerate(classes)}
     id2class = {id: class_ for class_, id in class2id.items()}
 
     print(f"Classes: {len(classes)}")
     print(f"Class2id: {class2id}")
     print(f"Id2class: {id2class}")
+    print(f"Input text column(s): {args.text_column} @ max_seq_length {args.max_seq_length}")
 
     ## Load the model and tokenizer
     tokenizer = AutoTokenizer.from_pretrained(args.model_name_or_path)
-    tokenized_dataset = dataset.map(lambda example: preprocess_function(example, class2id, tokenizer))
+    tokenized_dataset = dataset.map(
+        lambda example: preprocess_function(
+            example,
+            class2id,
+            tokenizer,
+            label_name=label_name,
+            text_column=args.text_column,
+            max_length=args.max_seq_length,
+        )
+    )
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
+
+    # the arxiv prep ships train/validation/simple_validation/test; a single local file has train only
+    eval_split = next((s for s in ("simple_validation", "validation", "test") if s in tokenized_dataset), None)
+    if eval_split is None:
+        holdout = tokenized_dataset["train"].train_test_split(test_size=0.1, seed=args.seed)
+        tokenized_dataset["train"], tokenized_dataset["validation"] = holdout["train"], holdout["test"]
+        eval_split = "validation"
+    test_split = "test" if "test" in tokenized_dataset else eval_split
+    print(f"Splits: train / eval={eval_split} / test={test_split}")
 
     model = AutoModelForSequenceClassification.from_pretrained(
         args.model_name_or_path,
@@ -88,7 +109,7 @@ def main():
         output_dir=os.path.join(args.output_dir, args.experiment_name),
         num_train_epochs=args.num_train_epochs,
         max_steps=args.max_steps,
-        evaluation_strategy="steps",
+        eval_strategy="steps",
         save_strategy="steps",
         logging_strategy="steps",
         eval_steps=args.eval_steps,
@@ -101,20 +122,32 @@ def main():
         warmup_ratio=0.1,  # override default
         gradient_accumulation_steps=args.gradient_accumulation_steps,
         save_total_limit=3,
-        push_to_hub=True,
+        push_to_hub=args.push_to_hub,
         hub_strategy="end",
         load_best_model_at_end=True,
         run_name=args.experiment_name,
         hub_model_id=args.experiment_name,
         label_smoothing_factor=args.label_smoothing_factor,
+        # this block rebuilds TrainingArguments field by field, so anything not forwarded here is
+        # silently dropped from the command line -- these are the runtime knobs a GPU run needs
+        seed=args.seed,
+        fp16=args.fp16,
+        bf16=args.bf16,
+        optim=args.optim,
+        lr_scheduler_type=args.lr_scheduler_type,
+        gradient_checkpointing=args.gradient_checkpointing,
+        dataloader_num_workers=args.dataloader_num_workers,
+        report_to=args.report_to,
+        metric_for_best_model=args.metric_for_best_model,
+        greater_is_better=args.greater_is_better,
     )
 
     trainer = MultiLabelTrainer(
         model=model,
         args=training_args,
         train_dataset=tokenized_dataset["train"],
-        eval_dataset=tokenized_dataset["simple_validation"],
-        tokenizer=tokenizer,
+        eval_dataset=tokenized_dataset[eval_split],
+        processing_class=tokenizer,
         data_collator=data_collator,
         compute_metrics=compute_metrics,
     )
@@ -126,23 +159,24 @@ def main():
     except KeyboardInterrupt as e:
         print(e)
 
-    subsample_test = tokenized_dataset["test"].select(list(range(0, 10000)))  # takes 30 minutes on desktop
+    test_dataset = tokenized_dataset[test_split]
+    subsample_test = test_dataset.select(range(min(10000, len(test_dataset))))  # takes 30 minutes on desktop
     trainer.evaluate(eval_dataset=subsample_test, metric_key_prefix="test")  # 10K samples is enough?
 
+    if args.push_to_hub:
+        trainer.push_to_hub(f"Saving best model of {args.experiment_name} to hub")
+
     # print some example outputs
-    trainer.push_to_hub(f"Saving best model of {args.experiment_name} to hub")
+    subset = subsample_test.select(range(min(100, len(subsample_test))))
+    probabilities = sigmoid(trainer.predict(subset).predictions)
+    predictions = (probabilities > 0.5).astype(int)
+    references = np.array(subset["labels"]).astype(int)
+
     print("Example outputs to check:")
-    subset = subsample_test.select(list(range(0, 100)))
-
-    preds = sigmoid(trainer.predict(subset).predictions)
-    predictions = (preds > 0.5).astype(int).reshape(-1)
-    references = np.array(subset["labels"]).astype(int).reshape(-1)
-    # convert to classes
-
     for i in range(len(subset)):
-        print(
-            f"P:{id2class[predictions[i]]} @{preds:{preds[i]}} vs. G:{id2class[references[i]]}"
-        )  # f'P:{predictions[i]} vs. G:{references[i]}'
+        predicted = [f"{id2class[j]}@{probabilities[i][j]:.2f}" for j in np.flatnonzero(predictions[i])]
+        gold = [id2class[j] for j in np.flatnonzero(references[i])]
+        print(f"P:{predicted} vs. G:{gold}")
 
 if __name__ == "__main__":
     main()

@@ -4,8 +4,9 @@ import random
 import numpy as np
 import torch
 import torch.nn as nn
+from datasets import load_dataset, load_from_disk
 from transformers import Trainer, TrainingArguments
-import evaluate
+from sklearn.metrics import precision_recall_fscore_support
 
 
 @dataclass
@@ -17,6 +18,31 @@ class CustomArguments:
     model_name_or_path: str = field(
         default="bert-base-uncased",  # "microsoft/deberta-v3-small", "allenai/scibert_scivocab_uncased"
         metadata={"help": "Path to pretrained model or model identifier from huggingface.co/models"},
+    )
+    dataset_name: str = field(
+        default="jordyvl/arxiv_dataset_prep",
+        metadata={
+            "help": """Dataset to train/evaluate on. Either a hub identifier, a directory saved with
+                  `save_to_disk`, or a .csv/.json/.jsonl file (a single file is loaded as the 'train' split)."""
+        },
+    )
+    text_column: str = field(
+        default="abstract",
+        metadata={
+            "help": """Dataset column(s) used as model input: 'abstract', 'title', or several columns
+                  joined with '+' (e.g. 'title+abstract'), which are concatenated with '. '."""
+        },
+    )
+    label_column: str = field(
+        default="cats",
+        metadata={"help": "Dataset column holding the list of gold labels per example"},
+    )
+    max_seq_length: int = field(
+        default=512,
+        metadata={
+            "help": """Truncation length in tokens. 512 suits abstracts; titles are ~15 tokens, so use
+                  something like 64 for --text_column title to avoid wasting compute on padding."""
+        },
     )
     criterion: str = field(
         default="BCEWithLogitsLoss",
@@ -63,15 +89,46 @@ def seed_everything(seed):
     torch.backends.cudnn.benchmark = True
 
 
-def preprocess_function(example, class2id, tokenizer, label_name="cats"):
-    text = example["abstract"]
+def load_any_dataset(dataset_name):
+    """Load a hub identifier, a `save_to_disk` directory, or a local csv/json/jsonl file.
+
+    A single local file has no splits of its own and lands in 'train'; the caller carves an
+    evaluation split out of it.
+    """
+    if os.path.isdir(dataset_name):
+        return load_from_disk(dataset_name)
+    if os.path.isfile(dataset_name):
+        extension = os.path.splitext(dataset_name)[1].lstrip(".").lower()
+        return load_dataset("json" if extension == "jsonl" else extension, data_files=dataset_name)
+    return load_dataset(dataset_name)
+
+
+def build_text(example, text_column="abstract"):
+    """Assemble the model input from one or more dataset columns.
+
+    A '+' joins columns (e.g. 'title+abstract'), skipping the ones that are empty for this example.
+    """
+    columns = text_column.split("+")
+    missing = [c for c in columns if c not in example]
+    if missing:
+        raise KeyError(
+            f"--text_column asked for {missing}, which the dataset does not have. "
+            f"Available columns: {sorted(example.keys())}"
+        )
+    parts = [(example[c] or "").strip() for c in columns]
+    return ". ".join(part for part in parts if part)
+
+
+def preprocess_function(example, class2id, tokenizer, label_name="cats", text_column="abstract", max_length=512):
+    text = build_text(example, text_column)
     all_labels = example[label_name]
     labels = np.zeros(len(class2id))
     for label in all_labels:
         label_id = class2id[label]
         labels[label_id] = 1.0
 
-    example = tokenizer(text, truncation=True, max_length=512, padding="max_length")
+    # padded dynamically per batch by DataCollatorWithPadding, so no padding to max_length here
+    example = tokenizer(text, truncation=True, max_length=max_length)
     example["labels"] = labels
     return example
 
@@ -94,30 +151,42 @@ def hamming_loss(y_true, y_pred):
     return np.mean(y_true != y_pred)
 
 
-clf_metrics = evaluate.combine(["accuracy", "precision", "recall", "f1"])
-
 # DEV:  port mAP for classes and instances from https://github.com/tk1980/TwoWayMultiLabelLoss/blob/main/utils/utils.py ?
+
+
+def multilabel_metrics(logits, references, threshold=0.5):
+    """Standard multi-label scores over a (n_samples, n_labels) binarized matrix.
+
+    `accuracy`/`precision`/`recall`/`f1` stay micro-averaged over label cells, matching what earlier
+    runs logged. `subset_accuracy` is the stricter exact-match ratio, and the macro scores weigh every
+    class equally, which is what the long-tailed arxiv label distribution actually stresses.
+    """
+    predictions = (sigmoid(np.asarray(logits)) > threshold).astype(int)
+    references = np.asarray(references).astype(int)
+
+    metrics = {
+        "accuracy": float((predictions == references).mean()),  # label-wise, i.e. 1 - hamming
+        "subset_accuracy": float((predictions == references).all(axis=1).mean()),
+        "hamming": float(hamming_loss(references, predictions)),
+    }
+    for average in ("micro", "macro"):
+        precision, recall, f1, _ = precision_recall_fscore_support(
+            references, predictions, average=average, zero_division=0
+        )
+        suffix = "" if average == "micro" else "_macro"
+        metrics[f"precision{suffix}"] = float(precision)
+        metrics[f"recall{suffix}"] = float(recall)
+        metrics[f"f1{suffix}"] = float(f1)
+    return metrics
 
 
 def compute_metrics(eval_pred):
     predictions, labels = eval_pred
-    predictions = sigmoid(predictions)
-    predictions = (predictions > 0.5).astype(int).reshape(-1)
-    references = labels.astype(int).reshape(-1)
-    batch_metrics = clf_metrics.compute(predictions=predictions, references=references)
-    batch_metrics["hamming"] = hamming_loss(references, predictions)
-    return batch_metrics
+    return multilabel_metrics(predictions, labels)
 
 
 def setfit_compute_metrics(predictions, labels, **metric_kwargs):
-    predictions = predictions.numpy()
-    labels = np.array(labels)
-    predictions = sigmoid(predictions)
-    predictions = (predictions > 0.5).astype(int).reshape(-1)
-    references = labels.astype(int).reshape(-1)
-    batch_metrics = clf_metrics.compute(predictions=predictions, references=references)
-    batch_metrics["hamming"] = hamming_loss(references, predictions)
-    return batch_metrics
+    return multilabel_metrics(predictions.numpy(), np.array(labels))
 
 
 class TwoWayLoss(nn.Module):
@@ -233,12 +302,14 @@ class MultiLabelTrainer(Trainer):
                 gamma_neg=self.args.Tp, gamma_pos=self.args.Tn
             )  # reusing args for gamma_neg and gamma_pos
 
-    def compute_loss(self, model, inputs, return_outputs=False):
-        """Overriding compute_loss to include alternative loss functions when training"""
+    def compute_loss(self, model, inputs, return_outputs=False, num_items_in_batch=None):
+        """Overriding compute_loss to include alternative loss functions when training
+
+        `num_items_in_batch` is passed by transformers >= 4.46 and is unused here: both custom
+        criteria already reduce over the batch themselves.
+        """
         outputs = model(**inputs)
         loss = outputs.loss  # default for multilabel is BCEWithLogitsLoss
         if self.criterion is not None:
-            labels = inputs.pop("labels")
-            logits = outputs.logits
-            loss = self.criterion(logits, labels)
+            loss = self.criterion(outputs.logits, inputs["labels"])
         return (loss, outputs) if return_outputs else loss

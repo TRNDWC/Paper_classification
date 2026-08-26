@@ -1,0 +1,19 @@
+# Minimal environment for training on a GPU box.
+#
+# Install PyTorch FIRST, matching the machine's CUDA version, from https://pytorch.org
+# e.g. CUDA 12.1:  pip install torch --index-url https://download.pytorch.org/whl/cu121
+# then:            pip install -r requirements-gpu.txt
+#
+# Versions below are the ones this code was verified against; the lower bounds matter because
+# transformers >= 4.46 renamed evaluation_strategy -> eval_strategy and changed the compute_loss
+# signature, which is what the scripts now target.
+
+transformers>=4.46,<5
+datasets>=3.0
+accelerate>=1.0
+scikit-learn>=1.3
+pandas>=2.0
+numpy>=1.26
+
+# optional: experiment tracking. Omit it and the scripts run with --report_to none.
+# wandb>=0.16

@@ -1,0 +1,31 @@
+field_id,field_name,subfield_id,subfield_name
+14,"Business, Management and Accounting",1402,Accounting
+26,Mathematics,2602,Algebra and Number Theory
+26,Mathematics,2604,Applied Mathematics
+17,Computer Science,1702,Artificial Intelligence
+22,Engineering,2203,Automotive Engineering
+14,"Business, Management and Accounting",1403,Business and International Management
+17,Computer Science,1703,Computational Theory and Mathematics
+17,Computer Science,1705,Computer Networks and Communications
+17,Computer Science,1706,Computer Science Applications
+17,Computer Science,1707,Computer Vision and Pattern Recognition
+22,Engineering,2207,Control and Systems Engineering
+20,"Economics, Econometrics and Finance",2002,Economics and Econometrics
+22,Engineering,2208,Electrical and Electronic Engineering
+20,"Economics, Econometrics and Finance",2003,Finance
+20,"Economics, Econometrics and Finance",2000,"General Economics, Econometrics and Finance"
+26,Mathematics,2608,Geometry and Topology
+17,Computer Science,1708,Hardware and Architecture
+17,Computer Science,1709,Human-Computer Interaction
+22,Engineering,2209,Industrial and Manufacturing Engineering
+17,Computer Science,1710,Information Systems
+14,"Business, Management and Accounting",1404,Management Information Systems
+14,"Business, Management and Accounting",1405,Management of Technology and Innovation
+14,"Business, Management and Accounting",1406,Marketing
+22,Engineering,2214,Media Technology
+26,Mathematics,2611,Modeling and Simulation
+26,Mathematics,2612,Numerical Analysis
+17,Computer Science,1711,Signal Processing
+17,Computer Science,1712,Software
+26,Mathematics,2613,Statistics and Probability
+26,Mathematics,2614,Theoretical Computer Science
