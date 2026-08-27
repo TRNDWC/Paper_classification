@@ -3,19 +3,19 @@
   "description": "",
   "features": {
     "id": {
-      "dtype": "large_string",
+      "dtype": "string",
       "_type": "Value"
     },
     "title": {
-      "dtype": "large_string",
+      "dtype": "string",
       "_type": "Value"
     },
     "abstract": {
-      "dtype": "large_string",
+      "dtype": "string",
       "_type": "Value"
     },
     "keyword": {
-      "dtype": "large_string",
+      "dtype": "string",
       "_type": "Value"
     },
     "cats": {
@@ -26,15 +26,15 @@
       "_type": "List"
     },
     "primary": {
-      "dtype": "large_string",
+      "dtype": "string",
       "_type": "Value"
     },
     "field": {
-      "dtype": "large_string",
+      "dtype": "string",
       "_type": "Value"
     },
     "strlabel": {
-      "dtype": "large_string",
+      "dtype": "string",
       "_type": "Value"
     }
   },
