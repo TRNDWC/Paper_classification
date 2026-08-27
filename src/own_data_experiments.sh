@@ -6,6 +6,15 @@
 #   title           F1_micro 0.5089  F1_macro 0.5133  subset_acc 0.1557
 #   abstract        F1_micro 0.5641  F1_macro 0.5678  subset_acc 0.2405
 #   title+abstract  F1_micro 0.5846  F1_macro 0.5913  subset_acc 0.2563
+#
+# Logging runs once per epoch (train loss + full eval metrics), not per step -- baseline_multilabel.py
+# hardcodes eval/save/logging_strategy to "epoch".
+#
+# If backgrounding this (nohup, screen, &), capture BOTH streams: transformers' logger and its tqdm
+# progress bar both write to stderr by default, so `bash own_data_experiments.sh > train.log &` alone
+# silently drops every epoch line. Use:
+#   nohup bash own_data_experiments.sh > train.log 2>&1 &
+#   tail -f train.log
 
 set -euo pipefail
 
@@ -24,8 +33,6 @@ TRACKING='--report_to none'
 BEST='--metric_for_best_model eval_f1 --greater_is_better True'
 
 COMMON="--output_dir ../results --seed 42 \
---eval_strategy steps --logging_strategy steps \
---logging_steps 0.05 --save_steps 0.2 --eval_steps 0.2 \
 --learning_rate 2e-5 --num_train_epochs 5 --lr_scheduler_type cosine \
 --dataloader_num_workers 4 $PRECISION $TRACKING $BEST"
 

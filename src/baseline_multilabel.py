@@ -79,14 +79,18 @@ def main():
     )
     data_collator = DataCollatorWithPadding(tokenizer=tokenizer)
 
-    # the arxiv prep ships train/validation/simple_validation/test; a single local file has train only
-    eval_split = next((s for s in ("simple_validation", "validation", "test") if s in tokenized_dataset), None)
-    if eval_split is None:
+    # no held-out validation set: evaluate directly against test every epoch, as requested. This
+    # means metric_for_best_model / load_best_model_at_end pick a checkpoint using test performance,
+    # so the final numbers are not a blind evaluation -- fine for iterating quickly, but for a
+    # protocol-clean number to report, prep the data with --validation_size > 0 and evaluate on that
+    # split instead.
+    if "test" not in tokenized_dataset:
         holdout = tokenized_dataset["train"].train_test_split(test_size=0.1, seed=args.seed)
-        tokenized_dataset["train"], tokenized_dataset["validation"] = holdout["train"], holdout["test"]
-        eval_split = "validation"
-    test_split = "test" if "test" in tokenized_dataset else eval_split
-    print(f"Splits: train / eval={eval_split} / test={test_split}")
+        tokenized_dataset["train"], tokenized_dataset["test"] = holdout["train"], holdout["test"]
+    eval_split = test_split = "test"
+    print(f"Splits: train / eval=test / test=test (n_train={len(tokenized_dataset['train'])}, "
+          f"n_test={len(tokenized_dataset['test'])})")
+    print("WARNING: no validation split -- checkpoint selection is based on test performance.")
 
     model = AutoModelForSequenceClassification.from_pretrained(
         args.model_name_or_path,
@@ -105,12 +109,13 @@ def main():
         output_dir=os.path.join(args.output_dir, args.experiment_name),
         num_train_epochs=args.num_train_epochs,
         max_steps=args.max_steps,
-        eval_strategy="steps",
-        save_strategy="steps",
-        logging_strategy="steps",
-        eval_steps=args.eval_steps,
-        save_steps=args.save_steps,
-        logging_steps=args.logging_steps,
+        # "epoch" guarantees one train-loss + eval line per epoch no matter the dataset size or
+        # batch size; the original "steps" + fractional eval_steps/save_steps was tuned for the
+        # 25K-step arxiv run and produced far sparser, epoch-misaligned logging on a smaller dataset
+        eval_strategy="epoch",
+        save_strategy="epoch",
+        logging_strategy="epoch",
+        logging_first_step=True,
         learning_rate=args.learning_rate,  # override for now
         per_device_train_batch_size=args.per_device_train_batch_size,
         per_device_eval_batch_size=args.per_device_train_batch_size,

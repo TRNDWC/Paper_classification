@@ -60,7 +60,14 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data_dir", default=os.path.join(os.path.dirname(__file__), "..", "data"))
     parser.add_argument("--output_dir", default=None, help="defaults to <data_dir>/papers_prepped")
-    parser.add_argument("--validation_size", type=float, default=0.1)
+    parser.add_argument(
+        "--validation_size",
+        type=float,
+        default=0.0,
+        help="fraction of train held out as a 'validation' split; 0 (default) keeps all of train "
+        "for training, since baseline_multilabel.py evaluates directly against the test split each "
+        "epoch and does not use a validation set",
+    )
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument(
         "--keep_leakage",
@@ -88,20 +95,19 @@ def main():
         train = train[~train["title"].str.lower().str.strip().isin(test_titles)]
         print(f"Dropped {deduped} duplicate titles and {before - deduped - len(train)} train/test overlaps")
 
-    train_split, validation_split = train_test_split(
-        train,
-        test_size=args.validation_size,
-        random_state=args.seed,
-        stratify=stratification_key(train["strlabel"].tolist()),
-    )
+    splits = {"train": Dataset.from_pandas(train, preserve_index=False)}
+    if args.validation_size > 0:
+        train_split, validation_split = train_test_split(
+            train,
+            test_size=args.validation_size,
+            random_state=args.seed,
+            stratify=stratification_key(train["strlabel"].tolist()),
+        )
+        splits["train"] = Dataset.from_pandas(train_split, preserve_index=False)
+        splits["validation"] = Dataset.from_pandas(validation_split, preserve_index=False)
+    splits["test"] = Dataset.from_pandas(test, preserve_index=False)
 
-    dataset = DatasetDict(
-        {
-            "train": Dataset.from_pandas(train_split, preserve_index=False),
-            "validation": Dataset.from_pandas(validation_split, preserve_index=False),
-            "test": Dataset.from_pandas(test, preserve_index=False),
-        }
-    )
+    dataset = DatasetDict(splits)
     dataset.save_to_disk(output_dir)
 
     print(f"\nSaved to {output_dir}")
